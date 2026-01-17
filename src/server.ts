@@ -3,18 +3,25 @@ import { Server as SocketIOServer, Socket } from "socket.io";
 import app from "./app";
 
 const server = http.createServer(app);
+
+// Create Socket.IO server
 const io = new SocketIOServer(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
+    origin: "http://localhost:3000",
+    credentials: true,
   },
 });
 
-io.on("connection", (socket: Socket) => {
-  console.log("A user connected");
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("geolocation", (data) => {
+    console.log("Received geolocation:", data);
+    socket.broadcast.emit("geolocation", data);
+  });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    console.log("User disconnected:", socket.id);
   });
 });
 
