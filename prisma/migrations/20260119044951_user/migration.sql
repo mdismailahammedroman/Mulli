@@ -4,15 +4,15 @@ CREATE TYPE "AuthenticationMethod" AS ENUM ('Email', 'Phone', 'Google', 'Faceboo
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "username" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT,
-    "passwordHash" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
-    "authenticationMethod" "AuthenticationMethod" NOT NULL,
-    "lastLogin" TIMESTAMP(3) NOT NULL,
+    "authenticationMethod" "AuthenticationMethod" NOT NULL DEFAULT 'Email',
+    "lastLogin" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -37,7 +37,7 @@ CREATE TABLE "Profile" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX "User_name_key" ON "User"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
