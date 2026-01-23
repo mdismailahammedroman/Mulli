@@ -11,6 +11,10 @@ model User {
   name                 String               @unique
   email                String               @unique
   phoneNumber          String?              @unique
+  Role                 UserRole             @default(USER)
+  authProvider         AuthProviderType     @default(CREDENTIAL)
+  providerID           String               @unique
+  userStatus           UserStatus           @default(PENDING)
   password             String
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
@@ -37,10 +41,28 @@ model Profile {
   user             User      @relation(fields: [userId], references: [id])
 }
 
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum AuthProviderType {
+  CREDENTIAL
+  GOOGLE
+}
+
 enum AuthenticationMethod {
   Email
   Phone
   Google
   Facebook
   Apple
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+  REJECTED
 }

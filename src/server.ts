@@ -1,6 +1,7 @@
 import http from "http";
 import { Server as SocketIOServer, Socket } from "socket.io";
 import app from "./app";
+import { EnvVars } from "./app/config/EnvVars";
 
 const server = http.createServer(app);
 
@@ -25,6 +26,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 3000}`);
+server.listen(EnvVars.PORT || 3000, () => {
+  console.log(`Server is running on port ${EnvVars.PORT || 3000}`);
 });

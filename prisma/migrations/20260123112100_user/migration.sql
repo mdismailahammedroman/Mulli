@@ -1,5 +1,14 @@
 -- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'USER');
+
+-- CreateEnum
+CREATE TYPE "AuthProviderType" AS ENUM ('CREDENTIAL', 'GOOGLE');
+
+-- CreateEnum
 CREATE TYPE "AuthenticationMethod" AS ENUM ('Email', 'Phone', 'Google', 'Facebook', 'Apple');
+
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('PENDING', 'APPROVED', 'SUSPENDED', 'REJECTED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -7,6 +16,10 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT,
+    "Role" "UserRole" NOT NULL DEFAULT 'USER',
+    "authProvider" "AuthProviderType" NOT NULL DEFAULT 'CREDENTIAL',
+    "providerID" TEXT NOT NULL,
+    "userStatus" "UserStatus" NOT NULL DEFAULT 'PENDING',
     "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -44,6 +57,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phoneNumber_key" ON "User"("phoneNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_providerID_key" ON "User"("providerID");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
