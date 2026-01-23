@@ -1,7 +1,12 @@
 import http from "http";
-import { Server as SocketIOServer, Socket } from "socket.io";
+import { Server as SocketIOServer } from "socket.io";
 import app from "./app";
+import { EnvVars } from "./app/config/EnvVars";
+import { seedSuperAdmin } from "./utils/SeedSuperAdmin";
 
+const PORT = EnvVars.PORT || 3000;
+
+// Create HTTP server from Express app
 const server = http.createServer(app);
 
 // Create Socket.IO server
@@ -12,6 +17,7 @@ const io = new SocketIOServer(server, {
   },
 });
 
+// Socket.IO events
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
@@ -25,6 +31,72 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 3000}`);
+const startServer = async () => {
+  try {
+    // Start server
+    server.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server or seed super admin:", error);
+    process.exit(1);
+  }
+};
+
+// Shutdown handler
+const shutdown = (signal?: string, error?: any) => {
+  console.log(`${signal || "Shutdown"} received. Closing server...`, error);
+  server.close(() => {
+    console.log("Server closed");
+    process.exit(1);
+  });
+};
+
+// Use an IIFE to start the server and seed super admin
+(async () => {
+  await startServer();
+  await seedSuperAdmin();
+})();
+
+process.on("SIGTERM", (error) => {
+  console.log("SIGTERM received...........Server shutting down", error);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+process.on("SIGINT", (error) => {
+  console.log("SIGINT  received...........Server shutting down", error);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+process.on("unhandledRejection", (error) => {
+  console.log(
+    "unhandledRejection  received...........Server shutting down",
+    error,
+  );
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+process.on("uncaughtException", (error) => {
+  console.log(
+    "unhandledRejection  received...........Server shutting down",
+    error,
+  );
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
 });

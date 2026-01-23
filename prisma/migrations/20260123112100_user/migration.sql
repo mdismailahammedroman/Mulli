@@ -1,18 +1,31 @@
 -- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'USER');
+
+-- CreateEnum
+CREATE TYPE "AuthProviderType" AS ENUM ('CREDENTIAL', 'GOOGLE');
+
+-- CreateEnum
 CREATE TYPE "AuthenticationMethod" AS ENUM ('Email', 'Phone', 'Google', 'Facebook', 'Apple');
+
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('PENDING', 'APPROVED', 'SUSPENDED', 'REJECTED');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "username" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT,
-    "passwordHash" TEXT NOT NULL,
+    "Role" "UserRole" NOT NULL DEFAULT 'USER',
+    "authProvider" "AuthProviderType" NOT NULL DEFAULT 'CREDENTIAL',
+    "providerID" TEXT NOT NULL,
+    "userStatus" "UserStatus" NOT NULL DEFAULT 'PENDING',
+    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
-    "authenticationMethod" "AuthenticationMethod" NOT NULL,
-    "lastLogin" TIMESTAMP(3) NOT NULL,
+    "authenticationMethod" "AuthenticationMethod" NOT NULL DEFAULT 'Email',
+    "lastLogin" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -37,13 +50,16 @@ CREATE TABLE "Profile" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX "User_name_key" ON "User"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phoneNumber_key" ON "User"("phoneNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_providerID_key" ON "User"("providerID");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
