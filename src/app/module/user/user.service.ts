@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
+import { AuthProviderType, UserRole, UserStatus } from "@prisma/client";
 
 const createUser = async (payload: {
   name: string;
@@ -22,6 +23,12 @@ const createUser = async (payload: {
       name: payload.name,
       email: payload.email,
       password: hashedPassword,
+
+      authProvider: AuthProviderType.CREDENTIAL, // ✅ fixed
+      providerID: payload.email, // required
+      Role: UserRole.USER, // optional, default is USER
+      userStatus: UserStatus.PENDING, // optional, default is PENDING
+      isVerified: false,
     },
   });
 
